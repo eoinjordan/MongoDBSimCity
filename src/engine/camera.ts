@@ -3,10 +3,10 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { clamp01, reduceMotion } from '../core/util'
 
 /** The default establishing shot: a three-quarter view over the whole request road. */
-export const HOME_POS = new THREE.Vector3(2, 58, 96)
-export const HOME_TARGET = new THREE.Vector3(-4, 2, 4)
+export const HOME_POS = new THREE.Vector3(4, 58, 96)
+export const HOME_TARGET = new THREE.Vector3(0, 2, 4)
 /** Portrait screens pull back to fit the road, but never so far that fog swallows the city. */
-export const PORTRAIT_MAX_SCALE = 1.8
+export const PORTRAIT_MAX_SCALE = 2.0
 
 export interface CameraRig {
   controls: OrbitControls
