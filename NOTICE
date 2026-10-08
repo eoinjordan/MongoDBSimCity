@@ -1,0 +1,42 @@
+MongoDBSimCity
+Copyright 2026 Eoin Jordan and contributors
+
+This product includes software developed as an independent, non-commercial
+educational visualization of how a MongoDB(R) 9.0 server works.
+
+TRADEMARKS AND AFFILIATION
+--------------------------
+This project is NOT affiliated with, sponsored by, endorsed by, or approved by
+MongoDB, Inc.
+
+MongoDB, WiredTiger, Atlas and the leaf logo are trademarks or registered
+trademarks of MongoDB, Inc. All trademarks are the property of their respective
+owners and are used here only for identification and educational description.
+
+"SimCity" is a trademark of Electronic Arts Inc. This project is not affiliated
+with Electronic Arts Inc. The name pattern is used to describe the genre of an
+explorable, city-style simulation and nothing more.
+
+MODEL DISCLAIMER
+----------------
+The simulation numbers, latencies, utilisation figures and throughput shown in
+this project are ILLUSTRATIVE and scaled to make the architecture observable.
+They are a teaching model, not measurements or benchmarks of any MongoDB
+deployment. Do not cite them as sizing guidance. The four WiredTiger eviction
+thresholds, the default cache-size rule, the 9.0 per-operation memory limit
+and the 9.0 transaction cap are quoted from MongoDB's public documentation
+(see docs/verification.md); everything else is invented for legibility.
+
+The optional "Measured server" panel reports numbers read from a real
+`serverStatus` document on a MongoDB you run yourself. Those are separately
+labelled measurements and are never fed into the illustrative model.
+
+ATTRIBUTION
+-----------
+Derived from HexagonNPUSimCity by Eoin Jordan
+(https://github.com/eoinjordan/HexagonNPUSimCity), Apache License 2.0, which was
+in turn inspired by PGSimCity by Nikolay Samokhvalov
+(https://github.com/NikolayS/PGSimCity), an educational 3D visualization of
+PostgreSQL internals.
+
+This software is licensed under the Apache License, Version 2.0. See LICENSE.

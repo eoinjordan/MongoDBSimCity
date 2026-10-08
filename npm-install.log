@@ -1,0 +1,107 @@
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'hexagon-npu-simcity@0.1.0',
+npm WARN EBADENGINE   required: { node: '>=22.18.0' },
+npm WARN EBADENGINE   current: { node: 'v21.7.1', npm: '10.5.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: '@asamuzakjp/css-color@5.1.11',
+npm WARN EBADENGINE   required: { node: '^20.19.0 || ^22.12.0 || >=24.0.0' },
+npm WARN EBADENGINE   current: { node: 'v21.7.1', npm: '10.5.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: '@asamuzakjp/dom-selector@7.1.1',
+npm WARN EBADENGINE   required: { node: '^20.19.0 || ^22.12.0 || >=24.0.0' },
+npm WARN EBADENGINE   current: { node: 'v21.7.1', npm: '10.5.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: '@asamuzakjp/generational-cache@1.0.1',
+npm WARN EBADENGINE   required: { node: '^20.19.0 || ^22.12.0 || >=24.0.0' },
+npm WARN EBADENGINE   current: { node: 'v21.7.1', npm: '10.5.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: '@exodus/bytes@1.15.1',
+npm WARN EBADENGINE   required: { node: '^20.19.0 || ^22.12.0 || >=24.0.0' },
+npm WARN EBADENGINE   current: { node: 'v21.7.1', npm: '10.5.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'balanced-match@4.0.4',
+npm WARN EBADENGINE   required: { node: '18 || 20 || >=22' },
+npm WARN EBADENGINE   current: { node: 'v21.7.1', npm: '10.5.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'brace-expansion@5.0.12',
+npm WARN EBADENGINE   required: { node: '20 || >=22' },
+npm WARN EBADENGINE   current: { node: 'v21.7.1', npm: '10.5.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'c8@12.0.0',
+npm WARN EBADENGINE   required: { node: '^20.19.0 || ^22.12.0 || >=23' },
+npm WARN EBADENGINE   current: { node: 'v21.7.1', npm: '10.5.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'data-urls@7.0.0',
+npm WARN EBADENGINE   required: { node: '^20.19.0 || ^22.12.0 || >=24.0.0' },
+npm WARN EBADENGINE   current: { node: 'v21.7.1', npm: '10.5.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'glob@13.0.6',
+npm WARN EBADENGINE   required: { node: '18 || 20 || >=22' },
+npm WARN EBADENGINE   current: { node: 'v21.7.1', npm: '10.5.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'html-encoding-sniffer@6.0.0',
+npm WARN EBADENGINE   required: { node: '^20.19.0 || ^22.12.0 || >=24.0.0' },
+npm WARN EBADENGINE   current: { node: 'v21.7.1', npm: '10.5.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'jsdom@29.1.1',
+npm WARN EBADENGINE   required: { node: '^20.19.0 || ^22.13.0 || >=24.0.0' },
+npm WARN EBADENGINE   current: { node: 'v21.7.1', npm: '10.5.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'lru-cache@11.5.2',
+npm WARN EBADENGINE   required: { node: '20 || >=22' },
+npm WARN EBADENGINE   current: { node: 'v21.7.1', npm: '10.5.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'minimatch@10.2.6',
+npm WARN EBADENGINE   required: { node: '18 || 20 || >=22' },
+npm WARN EBADENGINE   current: { node: 'v21.7.1', npm: '10.5.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'path-scurry@2.0.2',
+npm WARN EBADENGINE   required: { node: '18 || 20 || >=22' },
+npm WARN EBADENGINE   current: { node: 'v21.7.1', npm: '10.5.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'test-exclude@8.0.0',
+npm WARN EBADENGINE   required: { node: '20 || >=22' },
+npm WARN EBADENGINE   current: { node: 'v21.7.1', npm: '10.5.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'vite@7.3.6',
+npm WARN EBADENGINE   required: { node: '^20.19.0 || >=22.12.0' },
+npm WARN EBADENGINE   current: { node: 'v21.7.1', npm: '10.5.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'whatwg-url@16.0.1',
+npm WARN EBADENGINE   required: { node: '^20.19.0 || ^22.12.0 || >=24.0.0' },
+npm WARN EBADENGINE   current: { node: 'v21.7.1', npm: '10.5.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'yargs@18.1.0',
+npm WARN EBADENGINE   required: { node: '^20.19.0 || ^22.12.0 || >=23' },
+npm WARN EBADENGINE   current: { node: 'v21.7.1', npm: '10.5.0' }
+npm WARN EBADENGINE }
+npm WARN EBADENGINE Unsupported engine {
+npm WARN EBADENGINE   package: 'yargs-parser@22.0.0',
+npm WARN EBADENGINE   required: { node: '^20.19.0 || ^22.12.0 || >=23' },
+npm WARN EBADENGINE   current: { node: 'v21.7.1', npm: '10.5.0' }
+npm WARN EBADENGINE }
+
+added 141 packages in 28s
+npm notice 
+npm notice New major version of npm available! 10.5.0 -> 12.2.0
+npm notice Changelog: <https://github.com/npm/cli/releases/tag/v12.2.0>
+npm notice Run `npm install -g npm@12.2.0` to update!
+npm notice 

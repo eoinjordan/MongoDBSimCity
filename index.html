@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en" data-theme="night">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    />
+    <meta
+      name="description"
+      content="An independent, non-commercial educational 3D visualization of how a MongoDB 9.0 server works. Not affiliated with MongoDB, Inc."
+    />
+    <meta name="color-scheme" content="dark light" />
+    <meta name="theme-color" content="#05070e" />
+    <title>MongoDBSimCity · How MongoDB 9.0 Works, in 3D</title>
+
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="MongoDBSimCity" />
+    <meta property="og:title" content="MongoDBSimCity · How MongoDB 9.0 Works, in 3D" />
+    <meta
+      property="og:description"
+      content="An explorable 3D model of a MongoDB 9.0 server: the WiredTiger cache, query engine, indexes, replication, journal, sharding, security and mongot search, with documents you can watch flow through it."
+    />
+  </head>
+  <body>
+    <!-- WebGL canvas + CSS2D label layer mount here -->
+    <div id="stage">
+      <div id="canvas-root"></div>
+      <div id="labels-root" aria-hidden="true"></div>
+    </div>
+
+    <!-- HUD layers, filled by src/ui/* -->
+    <div id="hud">
+      <header id="hud-top"></header>
+      <aside id="hud-left"></aside>
+      <aside id="hud-right"></aside>
+      <footer id="hud-bottom"></footer>
+      <div id="inspector"></div>
+      <div id="tour-layer"></div>
+      <div id="help-overlay" hidden></div>
+    </div>
+
+    <!-- Boot screen -->
+    <div id="boot">
+      <div class="boot-inner">
+        <div class="boot-mark">
+          <svg viewBox="0 0 100 100" width="84" height="84" role="img" aria-label="MongoDBSimCity">
+            <defs>
+              <linearGradient id="bg1" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#00ed64" />
+                <stop offset="100%" stop-color="#22d3ee" />
+              </linearGradient>
+            </defs>
+            <path
+              d="M50 6 C 30 26, 22 44, 28 62 C 33 76, 44 84, 50 94 C 56 84, 67 76, 72 62 C 78 44, 70 26, 50 6 Z"
+              fill="rgba(7,13,24,.55)"
+              stroke="url(#bg1)"
+              stroke-width="2.6"
+            />
+            <path d="M50 20 L50 90" stroke="url(#bg1)" stroke-width="2" opacity="0.8" />
+            <circle cx="50" cy="50" r="5" fill="url(#bg1)" />
+          </svg>
+        </div>
+        <h1 class="boot-title">Mongo<span>DB</span>SimCity</h1>
+        <p class="boot-sub">A working model of a MongoDB 9.0 server</p>
+        <p class="boot-legal">
+          Independent, non-commercial educational visualization. Not affiliated with, sponsored by, or endorsed by
+          MongoDB, Inc. MongoDB, WiredTiger and Atlas are trademarks of MongoDB, Inc. Figures shown are illustrative,
+          not benchmarks.
+        </p>
+        <div class="boot-bar"><i id="boot-fill" style="width: 4%"></i></div>
+        <p class="boot-status" id="boot-status">loading the server…</p>
+      </div>
+    </div>
+
+    <noscript>
+      <div style="min-height: 100%; padding: 2rem; font: 16px system-ui; color: #dbe7ff; background: #05070e">
+        MongoDBSimCity needs JavaScript and WebGL2 to run.
+      </div>
+    </noscript>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
