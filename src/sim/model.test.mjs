@@ -81,10 +81,11 @@ test('all workload and topology combinations remain finite and bounded', () => {
       for (const value of [...Object.values(sim.state.util), sim.state.cacheOccupancy, sim.state.dirtyFraction, sim.state.cacheHit]) {
         assert.ok(Number.isFinite(value) && value >= 0 && value <= 1)
       }
-      for (const value of [sim.state.opsPerSec, sim.state.p99Ms, sim.state.docsInFlight]) {
+      for (const value of [sim.state.opsPerSec, sim.state.p99Ms, sim.state.docsInFlight, sim.state.connections]) {
         assert.ok(Number.isFinite(value) && value >= 0)
       }
       assert.ok(sim.state.p99Ms <= 3.4 * 6)
+      assert.ok(Number.isInteger(sim.state.stages) && sim.state.stages >= 1 && sim.state.stages <= 8)
     }
   }
 })

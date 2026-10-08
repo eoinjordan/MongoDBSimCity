@@ -122,6 +122,8 @@ export function createSettings(bus: Bus, sim: Sim): Settings {
       sliderRow('Ops scale', wl.opsScale, { min: 0, max: 1, step: 0.01 }, (v) => setProfile(wid, { opsScale: v })),
       sliderRow('Nominal cache hit rate', wl.hitRate, { min: 0, max: 1, step: 0.01, pct: true }, (v) => setProfile(wid, { hitRate: v })),
       numberRow('Documents in flight', wl.docs, { min: 0, max: 5000, step: 10 }, (v) => setProfile(wid, { docs: v })),
+      numberRow('Open connections', wl.connections, { min: 0, max: 10000, step: 10 }, (v) => setProfile(wid, { connections: v })),
+      numberRow('Pipeline stages', wl.stages, { min: 1, max: 8, step: 1 }, (v) => setProfile(wid, { stages: Math.max(1, Math.min(8, Math.round(v))) })),
     )
     drawer.append(wlSec)
 

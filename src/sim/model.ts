@@ -56,11 +56,11 @@ export const DEFAULT_SIM_CONFIG: SimConfig = {
   opsCeil: { standalone: 24_000, 'replica-set': 20_000, sharded: 60_000 },
   latencyBase: { standalone: 0.9, 'replica-set': 2.2, sharded: 3.4 },
   workloads: {
-    oltp: { query: 0.55, index: 0.7, storage: 0.6, repl: 0.75, cache: 0.62, dirty: 0.12, opsScale: 1, hitRate: 0.97, docs: 1200 },
-    analytics: { query: 0.9, index: 0.45, storage: 0.85, repl: 0.15, cache: 0.88, dirty: 0.04, opsScale: 0.18, hitRate: 0.72, docs: 2000 },
-    'vector-rag': { query: 0.6, index: 0.8, storage: 0.5, repl: 0.2, cache: 0.7, dirty: 0.03, opsScale: 0.25, hitRate: 0.9, docs: 600 },
-    timeseries: { query: 0.3, index: 0.35, storage: 0.8, repl: 0.7, cache: 0.55, dirty: 0.25, opsScale: 0.9, hitRate: 0.95, docs: 1600 },
-    idle: { query: 0.04, index: 0.03, storage: 0.05, repl: 0.08, cache: 0.3, dirty: 0.01, opsScale: 0.01, hitRate: 0.99, docs: 20 },
+    oltp: { query: 0.55, index: 0.7, storage: 0.6, repl: 0.75, cache: 0.62, dirty: 0.12, opsScale: 1, hitRate: 0.97, docs: 1200, connections: 240, stages: 2 },
+    analytics: { query: 0.9, index: 0.45, storage: 0.85, repl: 0.15, cache: 0.88, dirty: 0.04, opsScale: 0.18, hitRate: 0.72, docs: 2000, connections: 24, stages: 7 },
+    'vector-rag': { query: 0.6, index: 0.8, storage: 0.5, repl: 0.2, cache: 0.7, dirty: 0.03, opsScale: 0.25, hitRate: 0.9, docs: 600, connections: 60, stages: 4 },
+    timeseries: { query: 0.3, index: 0.35, storage: 0.8, repl: 0.7, cache: 0.55, dirty: 0.25, opsScale: 0.9, hitRate: 0.95, docs: 1600, connections: 400, stages: 1 },
+    idle: { query: 0.04, index: 0.03, storage: 0.05, repl: 0.08, cache: 0.3, dirty: 0.01, opsScale: 0.01, hitRate: 0.99, docs: 20, connections: 4, stages: 1 },
   },
   memory: { cacheGB: 4, perOpLimitGB: 1, ...WIREDTIGER_DEFAULTS },
   enabledFeatures: ['queryStats', 'wasmJs', 'qeSubstring', 'perOpMemoryLimit', 'queryKnobs'],
@@ -106,6 +106,8 @@ export function createSim(): Sim {
     opsPerSec: 0,
     p99Ms: 0,
     cacheHit: 0,
+    connections: 0,
+    stages: 2,
     util: { query: 0, index: 0, storage: 0, repl: 0 },
     cacheOccupancy: 0,
     dirtyFraction: 0,
@@ -126,6 +128,8 @@ export function createSim(): Sim {
     state.opsPerSec = config.opsCeil[state.topology] * w.opsScale * state.util.query
     state.cacheHit = clamp01(w.hitRate * (1 - 0.3 * pressure))
     state.p99Ms = config.latencyBase[state.topology] * (1 + 2 * state.util.query + 3 * pressure)
+    state.connections = Math.round(w.connections * (0.5 + 0.5 * state.util.query))
+    state.stages = w.stages
   }
 
   function update(dt: number): void {
@@ -175,6 +179,8 @@ export function createSim(): Sim {
       state.opsPerSec = 0
       state.p99Ms = 0
       state.cacheHit = 0
+      state.connections = 0
+      state.stages = 2
       state.util.query = state.util.index = state.util.storage = state.util.repl = 0
       state.cacheOccupancy = 0
       state.dirtyFraction = 0

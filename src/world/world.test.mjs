@@ -4,12 +4,12 @@ import * as THREE from 'three'
 import { createSim, TOPOLOGY_IDS, WORKLOADS } from '../sim/model.ts'
 import { districtGroup, glow, plinth, rim, roundedBox, surface } from './build.ts'
 import { createCity } from './city.ts'
-import { DISTRICTS, districtById } from './districts.ts'
-import { createGround, RAIL_TARGETS } from './ground.ts'
+import { DISTRICTS, districtById, REQUEST_PATH } from './districts.ts'
+import { createGround, SIDE_RAILS } from './ground.ts'
 import { assertFiniteScene, disposeScene, snapshotScene } from '../../tests/helpers/scene.mjs'
 
 test('district metadata has unique identities, finite positions and valid live readouts', () => {
-  assert.equal(DISTRICTS.length, 9)
+  assert.equal(DISTRICTS.length, 8)
   assert.equal(new Set(DISTRICTS.map((district) => district.id)).size, DISTRICTS.length)
   assert.equal(districtById('unknown'), undefined)
   const sim = createSim()
@@ -29,16 +29,17 @@ test('district metadata has unique identities, finite positions and valid live r
   }
 })
 
-test('the cache sits at the origin with the storage engine neighbours on the axes and the deployment on the corners', () => {
-  assert.deepEqual(districtById('cache').pos.toArray(), [0, 0, 0])
-  for (const id of RAIL_TARGETS) {
-    const p = districtById(id).pos
-    assert.ok((p.x === 0) !== (p.z === 0), `${id} must sit on one axis`)
-  }
-  for (const id of ['clients', 'sharding', 'security', 'search']) {
-    const p = districtById(id).pos
-    assert.ok(p.x !== 0 && p.z !== 0, `${id} must sit on a corner`)
-  }
+test('the request road runs west to east on one line, with disk south, mongot north and mongos off the road', () => {
+  const xs = REQUEST_PATH.map((id) => districtById(id).pos.x)
+  assert.deepEqual([...xs].sort((a, b) => a - b), xs)
+  for (const id of REQUEST_PATH) assert.equal(districtById(id).pos.z, 0, `${id} must sit on the road`)
+  const cache = districtById('cache').pos
+  assert.equal(districtById('disk').pos.x, cache.x)
+  assert.ok(districtById('disk').pos.z > 0)
+  assert.equal(districtById('mongot').pos.x, cache.x)
+  assert.ok(districtById('mongot').pos.z < 0)
+  assert.deepEqual(districtById('mongos').visibleIn, ['sharded'])
+  assert.ok(districtById('mongos').pos.z !== 0)
 })
 
 test('rounded geometry respects dimensions even when radius exceeds the box size', (context) => {
@@ -78,14 +79,15 @@ test('district primitives use independent positions and retain picking metadata'
   assertFiniteScene(group)
 })
 
-test('ground rails connect only the storage engine neighbours to the cache', (context) => {
+test('ground lays the request road, the side rails and two oplog rails', (context) => {
   const ground = createGround()
   context.after(() => disposeScene(ground))
   const rails = ground.children.filter((object) => object.geometry?.type === 'BoxGeometry')
-  assert.equal(rails.length, RAIL_TARGETS.length)
-  for (const id of RAIL_TARGETS) {
-    const position = districtById(id).pos
-    assert.ok(rails.some((rail) => rail.position.x === position.x / 2 && rail.position.z === position.z / 2))
+  assert.equal(rails.length, REQUEST_PATH.length - 1 + SIDE_RAILS.length + 2)
+  for (let i = 0; i < REQUEST_PATH.length - 1; i++) {
+    const a = districtById(REQUEST_PATH[i]).pos
+    const b = districtById(REQUEST_PATH[i + 1]).pos
+    assert.ok(rails.some((rail) => rail.position.x === (a.x + b.x) / 2 && rail.position.z === (a.z + b.z) / 2))
   }
   assertFiniteScene(ground)
 })
@@ -171,30 +173,41 @@ test('reset restores and replays all world animations, including the planner rin
   assert.deepEqual(snapshotScene(city.object), firstRun)
 })
 
-test('standalone topology darkens replication and the sharding grid only lights up when sharded', (context) => {
+test('topology adds and removes real nodes: secondaries leave in standalone, mongos only exists when sharded', (context) => {
   const city = createCity()
   const sim = createSim()
   context.after(() => disposeScene(city.object))
-  const brightness = (id) => {
-    const group = city.pickables.find((object) => object.userData.districtId === id)
-    let total = 0
-    group.traverse((object) => {
-      for (const material of [object.material].flat().filter(Boolean)) total += material.emissiveIntensity ?? 0
-    })
-    return total
-  }
+  const group = (id) => city.pickables.find((object) => object.userData.districtId === id)
   const run = (topology) => {
     sim.reset()
     sim.setTopology(topology)
-    for (let step = 0; step < 240; step++) {
+    for (let step = 0; step < 60; step++) {
       sim.update(1 / 60)
       city.update(1 / 60, sim.state)
     }
-    return { repl: brightness('replication'), shards: brightness('sharding') }
   }
-  const standalone = run('standalone')
-  const replicaSet = run('replica-set')
-  const sharded = run('sharded')
-  assert.ok(replicaSet.repl > standalone.repl)
-  assert.ok(sharded.shards > replicaSet.shards)
+  const secondaries = () => group('replication').children.filter((child) => child.isGroup).map((child) => child.visible)
+  run('standalone')
+  assert.deepEqual(secondaries(), [false, false])
+  assert.equal(group('mongos').visible, false)
+  run('replica-set')
+  assert.deepEqual(secondaries(), [true, true])
+  assert.equal(group('mongos').visible, false)
+  run('sharded')
+  assert.deepEqual(secondaries(), [true, true])
+  assert.equal(group('mongos').visible, true)
+})
+
+test('the query pipeline lights as many stages as the workload runs', (context) => {
+  const city = createCity()
+  const sim = createSim()
+  context.after(() => disposeScene(city.object))
+  const pipeline = city.pickables.find((object) => object.userData.districtId === 'query')
+  const litStages = () => pipeline.children.filter((child) => child.geometry && child.scale.y > 0.5 && child.material.emissiveIntensity > 0.1).length
+  sim.setWorkload('analytics')
+  for (let step = 0; step < 60; step++) { sim.update(1 / 60); city.update(1 / 60, sim.state) }
+  const analytics = litStages()
+  sim.setWorkload('timeseries')
+  for (let step = 0; step < 60; step++) { sim.update(1 / 60); city.update(1 / 60, sim.state) }
+  assert.ok(analytics > litStages())
 })

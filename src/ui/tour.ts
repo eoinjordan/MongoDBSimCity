@@ -9,60 +9,55 @@ interface TourStep {
 }
 
 /**
- * A short guided walk through one write and one read, following a document
- * from a driver into the server, through the storage engine, out to the
- * secondaries and back to an agent asking for similar documents.
+ * A guided walk along the request road: one write and one read, from a driver
+ * through the gates and the pipeline into the storage engine, down to disk,
+ * out to the secondaries, and back to an agent asking for similar documents.
  */
 const STEPS: TourStep[] = [
   {
     focus: 'home',
     title: 'A MongoDB 9.0 server, from above',
-    body: 'One mongod process. The WiredTiger cache sits in the middle; the query engine, indexes, replication and the journal surround it. The corners are the deployment around it. Let’s follow a document through.',
+    body: 'Read it west to east. Applications on the left, then the gates every request passes, then the query pipeline, then the WiredTiger cache with disk below and mongot above, then the oplog and the secondaries. Let’s follow a document.',
   },
   {
     focus: 'clients',
-    title: 'Clients, drivers and agents',
-    body: 'A driver sends BSON over the wire protocol (validated by default in 9.0). An AI agent arrives the same way, through the MongoDB MCP server. Everything it may do is decided here, inside the database, not by the model.',
+    title: 'Applications and agents',
+    body: 'A driver sends BSON; 9.0 validates every object on the way in. The two lime pods are agents: an MCP server and a change-stream consumer. What they may do is decided inside the database, never by the model.',
+  },
+  {
+    focus: 'gateway',
+    title: 'The gates',
+    body: 'Security is a gate on every request, not a building. A connection authenticates once; each operation is then checked against the roles of that identity. Watch a gate flash red when it refuses. The ring on top is Queryable Encryption: fields that stay encrypted through the gate and inside the server, now with substring queries in 9.0.',
+  },
+  {
+    focus: 'mongos',
+    title: 'mongos and the config servers',
+    body: 'Only in the sharded topology. Routers use the config servers’ metadata to send each operation to the shard that owns the chunk, and the balancer keeps chunks even. Switch to Sharded and this district and its pink routing appear.',
   },
   {
     focus: 'query',
-    title: 'The query engine',
-    body: 'Each command is parsed, planned and executed stage by stage. 9.0 caps a single operation at 1 GB or 20% of available memory, samples 1% of operations into $queryStats by default, and lets you pin knobs and a maxTimeMS to one query shape.',
-  },
-  {
-    focus: 'indexes',
-    title: 'Indexes',
-    body: 'B-tree keys let the planner skip straight to the right documents. Watch the lanes ripple harder on the OLTP and agent-RAG workloads, where almost every read is index-driven.',
+    title: 'The query pipeline',
+    body: 'Eight stage blocks on a conveyor; the lit ones are the stages this workload runs. OLTP is two stages, an aggregation is seven. 9.0 caps one operation at 1 GB or 20% of memory, samples 1% of operations into $queryStats, and lets you pin knobs and a maxTimeMS to a query shape.',
   },
   {
     focus: 'cache',
     title: 'The WiredTiger cache',
-    body: 'Pages live here; orange ones are dirty. The thresholds are real: eviction starts at 80% full, and at 95% the application threads themselves are pulled in to evict and latency climbs. Try Analytics and watch the column redden.',
+    body: 'Green pages are documents, violet pages are indexes, in the same cache; the little tree is a B-tree the planner walks, and violet keys travel back to the pipeline. Orange pages are dirty. The thresholds are real: eviction starts at 80%, at 95% application threads evict and latency climbs. Try Analytics.',
   },
   {
-    focus: 'journal',
-    title: 'Journal and checkpoints',
-    body: 'A committed write is in the write-ahead journal before the next checkpoint writes a consistent snapshot to disk. The dirty share of the cache is exactly what the next checkpoint has to flush.',
+    focus: 'disk',
+    title: 'Disk, journal and checkpoints',
+    body: 'Four collection files, two index files, and the cyan journal ribbon in front. A committed write is in the journal before the next checkpoint sweeps the files, every 60 s or 2 GB by default. The dirty share of the cache is what that sweep flushes.',
   },
   {
     focus: 'replication',
-    title: 'Replication and the oplog',
-    body: 'Every write becomes an oplog entry streamed to the secondaries; a majority write concern waits for most of them. Switch to Standalone and the ring goes dark. Change streams read this same stream.',
+    title: 'The oplog and the secondaries',
+    body: 'Every write becomes an oplog entry; the two secondaries beside the primary tail and apply it a beat behind. A majority write concern waits for one of them. Pick Standalone and they leave the city.',
   },
   {
-    focus: 'search',
+    focus: 'mongot',
     title: 'mongot: search and vector search',
-    body: 'A separate Lucene-based process keeps full-text and vector indexes in sync by consuming change streams. $search and $vectorSearch are routed to it by mongod. Pick the agent-RAG workload to see it wake.',
-  },
-  {
-    focus: 'sharding',
-    title: 'Sharding',
-    body: 'Pick the sharded topology: mongos routers, config servers and the balancer light up, and the ops ceiling rises because work spreads across shards. 9.0 adds metadata-consistency checks and shard-draining status.',
-  },
-  {
-    focus: 'security',
-    title: 'Security and Queryable Encryption',
-    body: 'Roles decide what each identity may do. Queryable Encryption keeps fields encrypted inside the server; 9.0 makes prefix, suffix and substring queries on those fields generally available and retires mongocryptd.',
+    body: 'A separate Lucene-based process kept in sync by consuming change streams from the oplog. $search and $vectorSearch stages are routed to it and rejoin the pipeline. Pick the agent-RAG workload to see it wake.',
   },
 ]
 

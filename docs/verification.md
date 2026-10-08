@@ -84,13 +84,17 @@ sharded cluster adds a router hop but multiplies capacity.
 
 **Workload profiles** (targets, 0..1 unless noted):
 
-| workload | query | index | storage | repl | cache | dirty | ops scale | hit rate | docs |
-|---|---|---|---|---|---|---|---|---|---|
-| OLTP | 0.55 | 0.70 | 0.60 | 0.75 | 0.62 | 0.12 | 1.00 | 0.97 | 1200 |
-| Analytics | 0.90 | 0.45 | 0.85 | 0.15 | 0.88 | 0.04 | 0.18 | 0.72 | 2000 |
-| Vector search · agent RAG | 0.60 | 0.80 | 0.50 | 0.20 | 0.70 | 0.03 | 0.25 | 0.90 | 600 |
-| Time series | 0.30 | 0.35 | 0.80 | 0.70 | 0.55 | 0.25 | 0.90 | 0.95 | 1600 |
-| Idle | 0.04 | 0.03 | 0.05 | 0.08 | 0.30 | 0.01 | 0.01 | 0.99 | 20 |
+| workload | query | index | storage | repl | cache | dirty | ops scale | hit rate | docs | connections | stages |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| OLTP | 0.55 | 0.70 | 0.60 | 0.75 | 0.62 | 0.12 | 1.00 | 0.97 | 1200 | 240 | 2 |
+| Analytics | 0.90 | 0.45 | 0.85 | 0.15 | 0.88 | 0.04 | 0.18 | 0.72 | 2000 | 24 | 7 |
+| Vector search · agent RAG | 0.60 | 0.80 | 0.50 | 0.20 | 0.70 | 0.03 | 0.25 | 0.90 | 600 | 60 | 4 |
+| Time series | 0.30 | 0.35 | 0.80 | 0.70 | 0.55 | 0.25 | 0.90 | 0.95 | 1600 | 400 | 1 |
+| Idle | 0.04 | 0.03 | 0.05 | 0.08 | 0.30 | 0.01 | 0.01 | 0.99 | 20 | 4 | 1 |
+
+`connections` lights the application servers and the gates
+(`connections × (0.5 + 0.5 × util.query)` are shown open); `stages` is how many
+of the eight pipeline blocks light up. Both are illustrative.
 
 **Metric formulas** (`refreshMetrics()` in `src/sim/model.ts`):
 

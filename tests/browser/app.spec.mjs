@@ -80,7 +80,7 @@ test('toolbar is keyboard-operable and reduced motion leaves the scene stable', 
 })
 
 test('home camera keeps the storage engine district labels within the viewport', async ({ page }) => {
-  const labels = page.locator('#stage .label').filter({ hasText: /^query engine|^indexes|^replication|^journal/i })
+  const labels = page.locator('#stage .label').filter({ hasText: /^query pipeline|^wiredtiger|^disk|^oplog/i })
   await expect(labels).toHaveCount(4)
   const boxes = await labels.evaluateAll((elements) => elements.map((element) => {
     const rect = element.getBoundingClientRect()

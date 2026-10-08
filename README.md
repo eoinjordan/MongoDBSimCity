@@ -24,21 +24,24 @@ A sibling of [HexagonNPUSimCity](https://github.com/eoinjordan/HexagonNPUSimCity
 
 ## What you are looking at
 
+The city is read **west to east along the request road**, the way a request
+actually travels, rather than as a hub with spokes.
+
 | District | What it is |
 |---|---|
-| **WiredTiger cache** (centre, green) | The storage engine's in-memory pages. Lit pages track occupancy, orange ones are dirty, and the column reddens as eviction pressure builds past the real 80% target towards the 95% trigger. |
-| **Query engine** (north, blue) | Parse, plan, execute. 9.0's per-operation memory limit, `$queryStats` sampling, per-shape query settings and the WASM JavaScript engine live here. |
-| **Indexes** (west, violet) | B-tree keys the planner walks instead of scanning. Lanes ripple with index-driven workloads. |
-| **Replication · oplog** (east, amber) | A primary and two secondaries joined by the oplog ring. Goes dark in the standalone topology. |
-| **Journal · checkpoints** (south, cyan) | The write-ahead log and the periodic snapshot to disk. The dirty share of the cache is what the next checkpoint flushes. |
-| **Clients · drivers · agents** (corner) | Applications, the MongoDB MCP server and change-stream consumers. The database decides what an agent may do. |
-| **Sharding · mongos** (corner) | Routers, config servers and the chunk balancer. Lights up only in the sharded topology. |
-| **Security · encryption** (corner) | Roles, audit and Queryable Encryption, including 9.0's prefix/suffix/substring queries on encrypted strings. |
-| **mongot · search & vector** (corner) | The separate Lucene-based process that keeps search and vector indexes in sync from change streams. Wakes on the agent-RAG workload. |
+| **Applications · agents** (far west, mint) | Where every document starts and ends: app servers lit per connection, plus two lime agent pods (an MCP server and a change-stream consumer). The database decides what an agent may do. |
+| **Connection · auth gates** (gold) | Security is a gate on every request, not a building. Five turnstiles open with load; one flashes red when it refuses. The ring on top is Queryable Encryption, with 9.0's substring queries. |
+| **mongos · config servers** (pink, sharded only) | Routers and the config servers' metadata. The district and its pink routing exist only when the topology is sharded. |
+| **Query pipeline** (teal) | Eight stage blocks on a conveyor; the lit ones are the stages the workload runs (OLTP two, an aggregation seven). 9.0's per-operation memory limit, `$queryStats` sampling and per-shape query settings live here. |
+| **WiredTiger cache** (green, with violet) | Document pages are green, index pages are violet, in the same cache, with a small B-tree above them handing keys back to the planner. Orange pages are dirty. The column reddens past the real 80% eviction target towards the 95% trigger. |
+| **Disk · journal · checkpoints** (south of the cache) | Four collection files, two index files, and the cyan journal ribbon. A checkpoint sweeps the files every few seconds, brighter the dirtier the cache. |
+| **Oplog · secondaries** (east, amber) | The oplog ring and primary, with two real secondary nodes beside it that apply the oplog a beat behind. They leave the city in the standalone topology. |
+| **mongot · search & vector** (north of the cache, lime) | The separate Lucene-based process kept in sync by change streams. Wakes on the agent-RAG workload. |
 
-Colour is meaning, never decoration: documents being read are **cyan**, writes are
-**orange**, the oplog is **amber**, change streams are **green**, checkpoints are
-**grey**, chunk migrations are **pink**.
+The particles are **documents**, small BSON slabs rather than spheres. Colour is
+meaning, never decoration: reads are **pale green**, writes **orange**, index keys
+**violet**, the oplog **amber**, change streams **lime**, checkpoints **grey-green**
+and mongos routing **pink**. The chrome is MongoDB green throughout.
 
 ## Controls
 

@@ -26,7 +26,7 @@ test('renderer creates a nonblank correctly sized WebGL canvas under a project b
   expect(info.ratio).toBeLessThanOrEqual(2)
   expect(info).toMatchObject({ srgb: true, filmic: true, shadows: true, filteredShadows: true, exposure: 1.1 })
   expect(info.calls).toBeGreaterThan(0)
-  await expect(page.locator('#labels-root .label')).toHaveCount(9)
+  await expect(page.locator('#labels-root .label')).toHaveCount(8)
   await page.screenshot({ path: testInfo.outputPath('scene.png') })
 })
 

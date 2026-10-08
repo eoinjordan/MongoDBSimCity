@@ -1,43 +1,43 @@
 :root {
   /* Semantic colour tokens — mirror src/core/theme.ts COLOR values. */
+  --c-clients: #9ad8c0;
+  --c-gateway: #e8c547;
+  --c-mongos: #ff5db1;
+  --c-query: #2dd4bf;
   --c-cache: #00ed64;
-  --c-query: #4aa3ff;
-  --c-index: #9b6cff;
+  --c-disk: #0f9d6c;
   --c-repl: #ffb020;
-  --c-journal: #22d3ee;
-  --c-clients: #8ab4ff;
-  --c-sharding: #ff5db1;
-  --c-security: #e8c547;
-  --c-search: #2dd4bf;
-  --c-document: #22d3ee;
+  --c-mongot: #b1ff05;
+  --c-index: #9b6cff;
+  --c-document: #8ff7c4;
   --c-write: #ff8a3d;
 
-  --bg: #05070e;
-  --panel: rgba(10, 16, 30, 0.82);
-  --panel-solid: #0a1020;
-  --stroke: rgba(120, 160, 220, 0.22);
-  --stroke-strong: rgba(120, 160, 220, 0.4);
-  --ink: #dbe7ff;
-  --ink-dim: #93a6c8;
-  --ink-faint: #5f7093;
+  --bg: #03120e;
+  --panel: rgba(3, 28, 21, 0.84);
+  --panel-solid: #052a20;
+  --stroke: rgba(0, 237, 100, 0.18);
+  --stroke-strong: rgba(0, 237, 100, 0.36);
+  --ink: #e6fff3;
+  --ink-dim: #9ccfb7;
+  --ink-faint: #5f8f7a;
   --accent: #00ed64;
 
   --radius: 12px;
   --radius-sm: 8px;
-  --shadow: 0 10px 40px rgba(0, 0, 0, 0.45);
+  --shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
   --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   --mono: 'SF Mono', ui-monospace, 'Cascadia Code', 'JetBrains Mono', Menlo, Consolas, monospace;
 }
 
 :root[data-theme='day'] {
-  --bg: #cfe0ee;
-  --panel: rgba(244, 249, 255, 0.86);
-  --panel-solid: #eaf1fb;
-  --stroke: rgba(30, 60, 110, 0.18);
-  --stroke-strong: rgba(30, 60, 110, 0.32);
-  --ink: #17263f;
-  --ink-dim: #43597c;
-  --ink-faint: #7387a6;
+  --bg: #d7f3e6;
+  --panel: rgba(240, 255, 247, 0.88);
+  --panel-solid: #e4f8ee;
+  --stroke: rgba(0, 104, 74, 0.2);
+  --stroke-strong: rgba(0, 104, 74, 0.36);
+  --ink: #0f3b2e;
+  --ink-dim: #2f6b56;
+  --ink-faint: #5f8f7a;
   --accent: #00684a;
-  --shadow: 0 10px 40px rgba(30, 50, 90, 0.18);
+  --shadow: 0 10px 40px rgba(0, 60, 40, 0.18);
 }

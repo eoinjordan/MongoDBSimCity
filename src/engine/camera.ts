@@ -2,9 +2,9 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { clamp01, reduceMotion } from '../core/util'
 
-/** The default establishing shot: a three-quarter view over the whole die. */
-const HOME_POS = new THREE.Vector3(48, 42, 66)
-const HOME_TARGET = new THREE.Vector3(0, 2, 0)
+/** The default establishing shot: a three-quarter view over the whole request road. */
+export const HOME_POS = new THREE.Vector3(4, 66, 108)
+export const HOME_TARGET = new THREE.Vector3(-4, 2, 4)
 
 export interface CameraRig {
   controls: OrbitControls
@@ -30,13 +30,13 @@ function easeInOut(x: number): number {
 
 export function createCameraRig(camera: THREE.PerspectiveCamera, dom: HTMLElement): CameraRig {
   const homePosition = () => HOME_TARGET.clone().add(
-    HOME_POS.clone().sub(HOME_TARGET).multiplyScalar(camera.aspect < 1 ? 1.15 / camera.aspect : 1),
+    HOME_POS.clone().sub(HOME_TARGET).multiplyScalar(camera.aspect < 1 ? 1.25 / camera.aspect : 1),
   )
   const controls = new OrbitControls(camera, dom)
   controls.enableDamping = true
   controls.dampingFactor = 0.08
   controls.minDistance = 14
-  controls.maxDistance = Math.max(170, homePosition().distanceTo(HOME_TARGET))
+  controls.maxDistance = Math.max(200, homePosition().distanceTo(HOME_TARGET))
   controls.maxPolarAngle = Math.PI * 0.49
   controls.target.copy(HOME_TARGET)
   camera.position.copy(homePosition())
@@ -58,14 +58,14 @@ export function createCameraRig(camera: THREE.PerspectiveCamera, dom: HTMLElemen
   function focus(target: THREE.Vector3, distance = 34): void {
     // Keep the current viewing direction but pull in to the chosen district.
     const dir = new THREE.Vector3().subVectors(camera.position, controls.target)
-    dir.y = Math.max(dir.y, distance * 0.45) // never dive below the die
+    dir.y = Math.max(dir.y, distance * 0.45) // never dive below the floor
     dir.normalize()
     const toPos = target.clone().add(dir.multiplyScalar(distance))
     glide(toPos, target)
   }
 
   function home(): void {
-    controls.maxDistance = Math.max(170, homePosition().distanceTo(HOME_TARGET))
+    controls.maxDistance = Math.max(200, homePosition().distanceTo(HOME_TARGET))
     glide(homePosition(), HOME_TARGET)
   }
 

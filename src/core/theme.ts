@@ -1,22 +1,33 @@
+/**
+ * A green city. Everything structural leans on MongoDB's greens; the few warm
+ * colours are reserved for things that are genuinely different in kind: gold for
+ * the auth gates, orange for writes, amber for the oplog, pink for routers.
+ * Colour is meaning, never decoration.
+ */
 export const COLOR = {
-  ground: 0x101719,
-  grid: 0x34464a,
-  bus: 0x42646b,
-  // Districts. Colour is meaning, never decoration.
+  ground: 0x06201a,
+  grid: 0x12463a,
+  bus: 0x1f6b55,
+  // Districts
+  clients: 0x9ad8c0,
+  gateway: 0xe8c547,
+  mongos: 0xff5db1,
+  query: 0x2dd4bf,
   cache: 0x00ed64,
-  query: 0x4aa3ff,
-  index: 0x9b6cff,
+  disk: 0x0f9d6c,
   repl: 0xffb020,
+  mongot: 0xb1ff05,
+  // Things inside districts
+  index: 0x9b6cff,
   journal: 0x22d3ee,
-  clients: 0x8ab4ff,
-  sharding: 0xff5db1,
-  security: 0xe8c547,
-  search: 0x2dd4bf,
-  // Dataflow.
-  document: 0x22d3ee,
+  dirty: 0xff8a3d,
+  pressure: 0xff4d4d,
+  // Dataflow
+  document: 0x8ff7c4,
   write: 0xff8a3d,
+  indexKey: 0x9b6cff,
   oplog: 0xffb020,
-  changeStream: 0x35d07f,
-  checkpoint: 0x8aa0c0,
-  chunk: 0xff5db1,
+  changeStream: 0xb1ff05,
+  checkpoint: 0x7fb8a4,
+  route: 0xff5db1,
 } as const

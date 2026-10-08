@@ -11,7 +11,7 @@ import { reduceMotion } from './core/util'
 import { createRenderer } from './engine/renderer'
 import { createCameraRig } from './engine/camera'
 import { createLabels } from './engine/labels'
-import { CONTEXT, createFlows } from './engine/flows'
+import { createFlows } from './engine/flows'
 import { createPicker } from './engine/picker'
 
 import { createSim } from './sim/model'
@@ -49,12 +49,12 @@ interface Atmosphere {
   key: number
 }
 const NIGHT: Atmosphere = {
-  background: 0x05070e, fog: 0x05070e, fogNear: 90, fogFar: 300,
-  hemiSky: 0x25406e, hemiGround: 0x05070e, ambient: 0.55, key: 1.15,
+  background: 0x03120e, fog: 0x03120e, fogNear: 110, fogFar: 340,
+  hemiSky: 0x1f5c47, hemiGround: 0x03120e, ambient: 0.55, key: 1.15,
 }
 const DAY: Atmosphere = {
-  background: 0xcfe0ee, fog: 0xcfe0ee, fogNear: 120, fogFar: 360,
-  hemiSky: 0xdcebff, hemiGround: 0x9fb4cf, ambient: 0.9, key: 1.4,
+  background: 0xd7f3e6, fog: 0xd7f3e6, fogNear: 140, fogFar: 400,
+  hemiSky: 0xe6fff3, hemiGround: 0x9ccfb7, ambient: 0.9, key: 1.4,
 }
 
 const boot = document.getElementById('boot')
@@ -73,18 +73,18 @@ const renderer = createRenderer(canvasRoot)
 const scene = new THREE.Scene()
 const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 2000)
 
-const hemi = new THREE.HemisphereLight(0xffffff, 0x223044, 0.6)
+const hemi = new THREE.HemisphereLight(0xffffff, 0x1a3d30, 0.6)
 const key = new THREE.DirectionalLight(0xffffff, 1.1)
 key.position.set(42, 74, 34)
 key.castShadow = true
 key.shadow.mapSize.set(2048, 2048)
 const shadowCam = key.shadow.camera as THREE.OrthographicCamera
-shadowCam.left = -80
-shadowCam.right = 80
-shadowCam.top = 80
-shadowCam.bottom = -80
+shadowCam.left = -90
+shadowCam.right = 90
+shadowCam.top = 90
+shadowCam.bottom = -90
 shadowCam.near = 1
-shadowCam.far = 280
+shadowCam.far = 300
 key.shadow.bias = -0.0004
 scene.add(hemi, key, key.target)
 
@@ -120,11 +120,11 @@ scene.add(city.object)
 const flows = createFlows()
 scene.add(flows.object)
 
-// District labels, plus three bits of context outside the server process.
+// District labels.
 const shortNames: Record<DistrictId, string> = {
-  cache: 'Cache', query: 'Query', indexes: 'Indexes', replication: 'Repl', journal: 'Journal',
-  clients: 'Clients', sharding: 'Shards', security: 'Security', search: 'mongot',
+  clients: 'Apps', gateway: 'Gates', mongos: 'mongos', query: 'Query', cache: 'Cache', disk: 'Disk', replication: 'Oplog', mongot: 'mongot',
 }
+const labelNodes = new Map<DistrictId, HTMLElement>()
 for (const l of city.labels) {
   const parts = l.name.split('·')
   const div = el('div', { class: 'label' })
@@ -133,10 +133,10 @@ for (const l of city.labels) {
     el('span', { class: 'label-short', text: shortNames[l.id] }),
   )
   labels.add(div, l.position)
+  labelNodes.set(l.id, div)
 }
-labels.add(el('div', { class: 'label label-ctx', text: 'Applications & agents' }), CONTEXT.applications.clone().setY(4.4))
-labels.add(el('div', { class: 'label label-ctx', text: 'Secondaries' }), CONTEXT.secondaries.clone().setY(4.2))
-labels.add(el('div', { class: 'label label-ctx', text: 'Disk · data files & journal' }), CONTEXT.disk.clone().setY(3.2))
+labels.add(el('div', { class: 'label label-ctx', text: 'Secondary' }), districtById('replication')!.pos.clone().setY(4).setZ(-20))
+labels.add(el('div', { class: 'label label-ctx', text: 'Secondary' }), districtById('replication')!.pos.clone().setY(4).setZ(20))
 
 setBoot(70, 'wiring controls…')
 const sim = createSim()
@@ -157,6 +157,8 @@ selRing.rotation.x = Math.PI / 2
 selRing.visible = false
 scene.add(selRing)
 
+const RING_RADIUS: Partial<Record<DistrictId, number>> = { cache: 13, disk: 12, query: 9, replication: 8 }
+
 function selectDistrict(id: string): void {
   const d = districtById(id)
   if (!d) {
@@ -166,7 +168,7 @@ function selectDistrict(id: string): void {
   inspector.show(d)
   ringMat.color.setHex(d.color)
   ringMat.emissive.setHex(d.color)
-  const r = d.id === 'cache' ? 13 : 8
+  const r = RING_RADIUS[d.id] ?? 7
   selRing.scale.set(r, r, r)
   selRing.position.set(d.pos.x, 0.6, d.pos.z)
   selRing.visible = true
@@ -189,7 +191,7 @@ bus.on('topology:change', ({ value }) => sim.setTopology(value as Topology))
 bus.on('district:select', ({ id }) => (id ? selectDistrict(id) : deselect()))
 bus.on('camera:focus', ({ id }) => {
   const d = districtById(id)
-  if (d) rig.focus(new THREE.Vector3(d.pos.x, 3, d.pos.z), d.id === 'cache' ? 52 : 32)
+  if (d) rig.focus(new THREE.Vector3(d.pos.x, 3, d.pos.z), d.id === 'cache' ? 52 : d.id === 'replication' ? 60 : 36)
 })
 bus.on('camera:home', () => rig.home())
 bus.on('pause:toggle', () => {
@@ -263,6 +265,12 @@ function frame(now: number): void {
   wall = Math.min(wall, 0.1)
   rig.update(wall)
   if (selRing.visible && running && !reduceMotion()) selRing.rotation.z = sim.state.t * 0.6
+  // Topology-only districts hide their label with their buildings.
+  for (const d of city.labels) {
+    const def = districtById(d.id)!
+    const node = labelNodes.get(d.id)
+    if (node && def.visibleIn) node.style.visibility = def.visibleIn.includes(sim.state.topology) ? '' : 'hidden'
+  }
   hud.update(sim.state)
   inspector.update(sim.state)
 

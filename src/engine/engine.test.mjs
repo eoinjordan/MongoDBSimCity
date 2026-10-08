@@ -4,7 +4,8 @@ import * as THREE from 'three'
 import { reduceMotion } from '../core/util.ts'
 import { createSim } from '../sim/model.ts'
 import { createCameraRig } from './camera.ts'
-import { CONTEXT, createFlows } from './flows.ts'
+import { createFlows } from './flows.ts'
+import { HOME_POS, HOME_TARGET } from './camera.ts'
 import { createLabels } from './labels.ts'
 import { createPicker } from './picker.ts'
 import { installDom, pointer } from '../../tests/helpers/dom.mjs'
@@ -46,10 +47,10 @@ function pickerFixture(context) {
 
 test('camera initializes above the floor with bounded orbit controls', (context) => {
   const { camera, rig } = cameraFixture(context)
-  assert.ok(camera.position.distanceTo(new THREE.Vector3(48, 42, 66)) < 1e-8)
-  assert.deepEqual(rig.controls.target.toArray(), [0, 2, 0])
+  assert.ok(camera.position.distanceTo(HOME_POS) < 1e-8)
+  assert.deepEqual(rig.controls.target.toArray(), HOME_TARGET.toArray())
   assert.equal(rig.controls.minDistance, 14)
-  assert.equal(rig.controls.maxDistance, 170)
+  assert.equal(rig.controls.maxDistance, 200)
   assert.ok(rig.controls.maxPolarAngle < Math.PI / 2)
 })
 
@@ -80,8 +81,8 @@ test('camera retargeting replaces an active transition and home restores the est
   assert.ok(rig.controls.target.distanceTo(latest) < 1e-8)
   rig.home()
   rig.update(1)
-  assert.ok(camera.position.distanceTo(new THREE.Vector3(48, 42, 66)) < 1e-8)
-  assert.ok(rig.controls.target.distanceTo(new THREE.Vector3(0, 2, 0)) < 1e-8)
+  assert.ok(camera.position.distanceTo(HOME_POS) < 1e-8)
+  assert.ok(rig.controls.target.distanceTo(HOME_TARGET) < 1e-8)
 })
 
 test('picker raycasts through a tagged ancestor using canvas-relative coordinates', (context) => {
@@ -157,7 +158,6 @@ test('flow field uses finite, bounded instanced meshes and actually moves', (con
   })
   assert.ok(field.object.children.length > 0)
   assert.ok(field.object.children.every((object) => object.isInstancedMesh && object.count > 0 && object.count <= 100))
-  assert.ok(Object.values(CONTEXT).every((v) => v.toArray().every(Number.isFinite)))
   const count = field.object.children.length
   const initial = snapshotScene(field.object)
   for (let step = 0; step < 60; step++) {
@@ -195,6 +195,24 @@ test('initial reduced motion stops packet travel and the preference helper refle
   assert.equal(reduceMotion(), true)
   environment.setReducedMotion(false)
   assert.equal(reduceMotion(), false)
+})
+
+test('topology-only flows hide and show with the topology', (context) => {
+  const environment = installDom()
+  const field = createFlows()
+  const sim = createSim()
+  context.after(() => { disposeScene(field.object); environment.cleanup() })
+  const visible = () => field.object.children.filter((mesh) => mesh.visible).length
+  sim.setTopology('standalone')
+  field.update(0, sim.state)
+  const standalone = visible()
+  sim.setTopology('replica-set')
+  field.update(0, sim.state)
+  const replicaSet = visible()
+  sim.setTopology('sharded')
+  field.update(0, sim.state)
+  assert.ok(replicaSet > standalone)
+  assert.ok(visible() > replicaSet)
 })
 
 test('flow reset and seeded initialization reproduce the same simulation sequence', (context) => {

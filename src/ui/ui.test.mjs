@@ -125,7 +125,7 @@ test('HUD toolbar and district legend dispatch the expected action contracts', (
   bus.on('district:select', (payload) => selections.push(['select', payload.id]))
   bus.on('camera:focus', (payload) => selections.push(['focus', payload.id]))
   document.querySelector('#hud-right .legend-row').click()
-  assert.deepEqual(selections, [['select', 'cache'], ['focus', 'cache']])
+  assert.deepEqual(selections, [['select', 'clients'], ['focus', 'clients']])
 })
 
 test('HUD reflects metrics, selections, utilization and pause state after updates', (context) => {
@@ -244,7 +244,7 @@ test('component integration: HUD events drive the real model, clock and inspecto
   assert.ok(sim.state.opsPerSec > 0)
   document.querySelector('#hud-right .legend-row').click()
   inspector.update(sim.state)
-  assert.equal(document.querySelector('#inspector .readout').textContent, districtById('cache').readout(sim.state))
+  assert.equal(document.querySelector('#inspector .readout').textContent, districtById('clients').readout(sim.state))
   document.querySelectorAll('#hud-left .tool')[1].click()
   assert.equal(sim.state.paused, true)
   const paused = structuredClone(sim.state)
@@ -361,7 +361,7 @@ test('help is lazy-built, labelled, focused, reusable and dismissible by button,
   assert.match(overlay.textContent, /illustrative/i)
   const cameraRows = overlay.querySelectorAll('.help-grid > div:first-child .kbd-row')
   assert.equal(cameraRows[0].textContent, 'OrbitDrag')
-  assert.equal(cameraRows[1].querySelector('span').textContent, 'Pan across the deployment')
+  assert.equal(cameraRows[1].querySelector('span').textContent, 'Pan along the request road')
   for (const district of DISTRICTS) assert.ok(overlay.textContent.includes(district.name))
   const panel = overlay.firstElementChild
   panel.click()

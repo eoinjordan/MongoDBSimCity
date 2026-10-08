@@ -1,18 +1,17 @@
 import type { Vector3 } from 'three'
 
-/** Illustrative deployment shapes. They scale the ops ceiling and the latency floor. */
+/** Illustrative deployment shapes. They scale the ops ceiling and the latency floor, and add real nodes to the city. */
 export type Topology = 'standalone' | 'replica-set' | 'sharded'
 export type WorkloadId = 'oltp' | 'analytics' | 'vector-rag' | 'timeseries' | 'idle'
-export type DistrictId =
-  | 'cache'
-  | 'query'
-  | 'indexes'
-  | 'replication'
-  | 'journal'
-  | 'clients'
-  | 'sharding'
-  | 'security'
-  | 'search'
+
+/**
+ * Districts, west to east along the request path: applications and agents,
+ * the connection and auth gates, the query pipeline, the WiredTiger cache
+ * (documents and index pages together), then the oplog and the secondaries.
+ * Disk sits under the cache, mongot above it, and mongos only appears when
+ * the topology is sharded.
+ */
+export type DistrictId = 'clients' | 'gateway' | 'mongos' | 'query' | 'cache' | 'disk' | 'replication' | 'mongot'
 
 export interface WorkloadDef {
   id: WorkloadId
@@ -34,6 +33,10 @@ export interface SimState {
   p99Ms: number
   /** 0..1 fraction of reads served from the WiredTiger cache. */
   cacheHit: number
+  /** Illustrative open client connections. */
+  connections: number
+  /** Pipeline stages the current workload typically runs (1..8). */
+  stages: number
   util: { query: number; index: number; storage: number; repl: number }
   /** 0..1 share of the WiredTiger cache holding pages. */
   cacheOccupancy: number
@@ -59,6 +62,10 @@ export interface WorkloadProfile {
   hitRate: number
   /** Baseline documents in flight for this workload. */
   docs: number
+  /** Baseline open connections for this workload. */
+  connections: number
+  /** Typical number of query/aggregation stages, 1..8. */
+  stages: number
 }
 
 /**
@@ -117,4 +124,6 @@ export interface DistrictDef {
   pos: Vector3
   blurb: string
   readout(state: SimState): string
+  /** Districts that only exist in some topologies (mongos). */
+  visibleIn?: Topology[]
 }

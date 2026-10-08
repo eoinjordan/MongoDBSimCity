@@ -12,7 +12,7 @@ export interface Help {
 
 const CAMERA_KEYS: [string, string][] = [
   ['Drag', 'Orbit'],
-  ['Shift · drag', 'Pan across the deployment'],
+  ['Shift · drag', 'Pan along the request road'],
   ['Wheel / pinch', 'Zoom'],
   ['Click', 'Select a district'],
 ]
@@ -65,11 +65,12 @@ export function createHelp(bus: Bus): Help {
         el('div', {}, [
           el('h4', { text: 'Dataflow' }),
           swatch(COLOR.document, 'Documents read'),
-          swatch(COLOR.write, 'Writes'),
+          swatch(COLOR.write, 'Writes to cache and journal'),
+          swatch(COLOR.indexKey, 'Index keys from the B-trees'),
           swatch(COLOR.oplog, 'Oplog to secondaries'),
-          swatch(COLOR.changeStream, 'Change streams'),
+          swatch(COLOR.changeStream, 'Change streams to mongot and agents'),
           swatch(COLOR.checkpoint, 'Checkpoints to disk'),
-          swatch(COLOR.chunk, 'Chunk migrations'),
+          swatch(COLOR.route, 'mongos routing (sharded)'),
         ]),
       ]),
       el('button', { class: 'btn help-close', text: 'Close (Esc)', onclick: () => close() }),

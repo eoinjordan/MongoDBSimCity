@@ -31,7 +31,7 @@ export function createHud(deps: HudDeps): Hud {
   /* ---- top bar ---- */
   const brand = el('div', { class: 'brand' }, [
     el('div', {
-      html: `<svg viewBox="0 0 100 100" width="30" height="30"><defs><linearGradient id="hb" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#00ed64"/><stop offset="100%" stop-color="#22d3ee"/></linearGradient></defs><path d="M50 6 C 30 26, 22 44, 28 62 C 33 76, 44 84, 50 94 C 56 84, 67 76, 72 62 C 78 44, 70 26, 50 6 Z" fill="none" stroke="url(#hb)" stroke-width="6"/><path d="M50 24 L50 88" stroke="url(#hb)" stroke-width="5"/></svg>`,
+      html: `<svg viewBox="0 0 100 100" width="30" height="30"><defs><linearGradient id="hb" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#00ed64"/><stop offset="100%" stop-color="#b1ff05"/></linearGradient></defs><path d="M50 6 C 30 26, 22 44, 28 62 C 33 76, 44 84, 50 94 C 56 84, 67 76, 72 62 C 78 44, 70 26, 50 6 Z" fill="none" stroke="url(#hb)" stroke-width="6"/><path d="M50 24 L50 88" stroke="url(#hb)" stroke-width="5"/></svg>`,
     }),
     el('div', { class: 'brand-text' }, [
       el('div', { class: 'brand-title', html: 'Mongo<span>DB</span>SimCity' }),
@@ -106,10 +106,11 @@ export function createHud(deps: HudDeps): Hud {
   const flowLegend: [number, string][] = [
     [COLOR.document, 'Documents read'],
     [COLOR.write, 'Writes'],
+    [COLOR.indexKey, 'Index keys'],
     [COLOR.oplog, 'Oplog'],
     [COLOR.changeStream, 'Change streams'],
     [COLOR.checkpoint, 'Checkpoints'],
-    [COLOR.chunk, 'Chunk migrations'],
+    [COLOR.route, 'mongos routing'],
   ]
   for (const [c, name] of flowLegend) {
     legend.append(
