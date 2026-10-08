@@ -6,7 +6,7 @@ import { clamp01, reduceMotion } from '../core/util'
 export const HOME_POS = new THREE.Vector3(4, 58, 96)
 export const HOME_TARGET = new THREE.Vector3(0, 2, 4)
 /** Portrait screens pull back to fit the road, but never so far that fog swallows the city. */
-export const PORTRAIT_MAX_SCALE = 2.0
+export const PORTRAIT_MAX_SCALE = 2.3
 
 export interface CameraRig {
   controls: OrbitControls
