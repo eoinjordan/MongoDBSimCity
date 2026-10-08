@@ -8,3 +8,4 @@ npm-install.log
 /coverage/
 /playwright-report/
 /test-results/
+preview.log
