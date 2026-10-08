@@ -33,7 +33,7 @@
       const renderer = createRenderer(root)
       const scene = new THREE.Scene()
       scene.background = new THREE.Color(0x101719)
-      scene.fog = new THREE.Fog(0x101719, 110, 230)
+      scene.fog = new THREE.Fog(0x101719, 120, 440)
       scene.add(new THREE.HemisphereLight(0xffffff, 0x263238, 2.5))
       const light = new THREE.DirectionalLight(0xffffff, 3)
       light.position.set(25, 60, 35)
@@ -42,7 +42,7 @@
       const rig = createCameraRig(camera, renderer.domElement)
       if (innerWidth < 600) {
         camera.fov = 65
-        camera.position.multiplyScalar(1.6)
+        camera.position.multiplyScalar(1.3)
         camera.updateProjectionMatrix()
         rig.controls.update()
       }

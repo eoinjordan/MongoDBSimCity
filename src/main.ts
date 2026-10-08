@@ -49,11 +49,11 @@ interface Atmosphere {
   key: number
 }
 const NIGHT: Atmosphere = {
-  background: 0x03120e, fog: 0x03120e, fogNear: 110, fogFar: 340,
+  background: 0x03120e, fog: 0x03120e, fogNear: 120, fogFar: 440,
   hemiSky: 0x1f5c47, hemiGround: 0x03120e, ambient: 0.55, key: 1.15,
 }
 const DAY: Atmosphere = {
-  background: 0xd7f3e6, fog: 0xd7f3e6, fogNear: 140, fogFar: 400,
+  background: 0xd7f3e6, fog: 0xd7f3e6, fogNear: 150, fogFar: 500,
   hemiSky: 0xe6fff3, hemiGround: 0x9ccfb7, ambient: 0.9, key: 1.4,
 }
 

@@ -3,8 +3,10 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { clamp01, reduceMotion } from '../core/util'
 
 /** The default establishing shot: a three-quarter view over the whole request road. */
-export const HOME_POS = new THREE.Vector3(4, 66, 108)
+export const HOME_POS = new THREE.Vector3(2, 58, 96)
 export const HOME_TARGET = new THREE.Vector3(-4, 2, 4)
+/** Portrait screens pull back to fit the road, but never so far that fog swallows the city. */
+export const PORTRAIT_MAX_SCALE = 1.8
 
 export interface CameraRig {
   controls: OrbitControls
@@ -30,7 +32,7 @@ function easeInOut(x: number): number {
 
 export function createCameraRig(camera: THREE.PerspectiveCamera, dom: HTMLElement): CameraRig {
   const homePosition = () => HOME_TARGET.clone().add(
-    HOME_POS.clone().sub(HOME_TARGET).multiplyScalar(camera.aspect < 1 ? 1.25 / camera.aspect : 1),
+    HOME_POS.clone().sub(HOME_TARGET).multiplyScalar(camera.aspect < 1 ? Math.min(PORTRAIT_MAX_SCALE, 1.25 / camera.aspect) : 1),
   )
   const controls = new OrbitControls(camera, dom)
   controls.enableDamping = true

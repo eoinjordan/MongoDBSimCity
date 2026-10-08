@@ -14,10 +14,20 @@ import { DistrictBuild, districtGroup, glow, roundedBox, surface } from './build
  */
 const GRID = 16
 const INDEX_COLS = 5
-const N = GRID * GRID
 const PITCH = 1.02
 const HALF = ((GRID - 1) * PITCH) / 2
 const DECK_Y = 2.0
+
+interface PageBank {
+  mesh: THREE.InstancedMesh
+  mat: THREE.MeshStandardMaterial
+  base: THREE.Color
+  px: Float32Array
+  pz: Float32Array
+  threshold: Float32Array
+  dirtyRank: Float32Array
+  index: boolean
+}
 
 export function createCache(def: DistrictDef): DistrictBuild {
   const group = districtGroup(def)
@@ -29,35 +39,37 @@ export function createCache(def: DistrictDef): DistrictBuild {
   group.add(deck)
 
   const cell = roundedBox(0.82, 1.2, 0.82, 0.12)
-  const mat = surface(0xffffff, { emissiveIntensity: 0.5, roughness: 0.4, metalness: 0.2 })
-  mat.emissive = new THREE.Color(0xffffff)
-  const pages = new THREE.InstancedMesh(cell, mat, N)
-  pages.instanceMatrix.setUsage(THREE.DynamicDrawUsage)
-  pages.castShadow = true
-  pages.position.y = DECK_Y
-  group.add(pages)
+  const rng = makeRng(0x7a11)
 
-  const docColor = new THREE.Color(def.color)
-  const indexColor = new THREE.Color(COLOR.index)
+  // Two banks of pages so each can glow in its own colour: documents and indexes.
+  function bank(index: boolean, colorHex: number): PageBank {
+    const cols = index ? INDEX_COLS : GRID - INDEX_COLS
+    const n = cols * GRID
+    const mat = surface(colorHex, { emissiveIntensity: 0.45, roughness: 0.4, metalness: 0.2 })
+    const mesh = new THREE.InstancedMesh(cell, mat, n)
+    mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage)
+    mesh.castShadow = true
+    mesh.position.y = DECK_Y
+    group.add(mesh)
+    const px = new Float32Array(n)
+    const pz = new Float32Array(n)
+    const threshold = new Float32Array(n)
+    const dirtyRank = new Float32Array(n)
+    for (let i = 0; i < n; i++) {
+      const gx = (index ? GRID - INDEX_COLS : 0) + (i % cols)
+      const gz = (i / cols) | 0
+      px[i] = gx * PITCH - HALF
+      pz[i] = gz * PITCH - HALF
+      // Pages near the centre fill first, with a little noise.
+      const r = Math.hypot(px[i], pz[i]) / HALF
+      threshold[i] = Math.min(1, r * 0.85 + rng() * 0.25)
+      dirtyRank[i] = rng()
+    }
+    return { mesh, mat, base: new THREE.Color(colorHex), px, pz, threshold, dirtyRank, index }
+  }
+  const banks = [bank(false, def.color), bank(true, COLOR.index)]
   const dirtyColor = new THREE.Color(COLOR.dirty)
   const pressureColor = new THREE.Color(COLOR.pressure)
-  const rng = makeRng(0x7a11)
-  const threshold = new Float32Array(N)
-  const dirtyRank = new Float32Array(N)
-  const isIndex = new Uint8Array(N)
-  const px = new Float32Array(N)
-  const pz = new Float32Array(N)
-  for (let i = 0; i < N; i++) {
-    const gx = i % GRID
-    const gz = (i / GRID) | 0
-    px[i] = gx * PITCH - HALF
-    pz[i] = gz * PITCH - HALF
-    isIndex[i] = gx >= GRID - INDEX_COLS ? 1 : 0
-    // Pages near the centre fill first, with a little noise.
-    const r = Math.hypot(px[i], pz[i]) / HALF
-    threshold[i] = Math.min(1, r * 0.85 + rng() * 0.25)
-    dirtyRank[i] = rng()
-  }
 
   // A small B-tree over the index pages: root, two internal nodes, four leaves.
   const tree = new THREE.Group()
@@ -93,26 +105,29 @@ export function createCache(def: DistrictDef): DistrictBuild {
 
   const dummy = new THREE.Object3D()
   const color = new THREE.Color()
+  const docColor = new THREE.Color(def.color)
 
   function update(_dt: number, s: SimState): void {
     const occ = s.cacheOccupancy
     const dirty = s.dirtyFraction
-    const indexHeat = 0.5 + 0.5 * s.util.index
-    for (let i = 0; i < N; i++) {
-      const lit = threshold[i] < occ
-      const index = isIndex[i] === 1
-      const isDirty = lit && !index && dirtyRank[i] < dirty
-      const shimmer = lit ? 0.78 + 0.22 * Math.sin(s.t * 3 + i * 0.7) : 0.16
-      const h = lit ? 1 + 1.6 * occ : 0.35
-      dummy.position.set(px[i], (h * 1.2) / 2 - 0.6, pz[i])
-      dummy.scale.set(1, h, 1)
-      dummy.updateMatrix()
-      pages.setMatrixAt(i, dummy.matrix)
-      color.copy(isDirty ? dirtyColor : index ? indexColor : docColor).multiplyScalar(shimmer * (index ? indexHeat : 1))
-      pages.setColorAt(i, color)
+    for (const b of banks) {
+      const n = b.mesh.count
+      for (let i = 0; i < n; i++) {
+        const lit = b.threshold[i] < occ
+        const isDirty = lit && !b.index && b.dirtyRank[i] < dirty
+        const shimmer = lit ? 0.78 + 0.22 * Math.sin(s.t * 3 + i * 0.7) : 0.16
+        const h = lit ? 1 + 1.6 * occ : 0.35
+        dummy.position.set(b.px[i], (h * 1.2) / 2 - 0.6, b.pz[i])
+        dummy.scale.set(1, h, 1)
+        dummy.updateMatrix()
+        b.mesh.setMatrixAt(i, dummy.matrix)
+        color.copy(isDirty ? dirtyColor : b.base).multiplyScalar(shimmer)
+        b.mesh.setColorAt(i, color)
+      }
+      b.mesh.instanceMatrix.needsUpdate = true
+      if (b.mesh.instanceColor) b.mesh.instanceColor.needsUpdate = true
+      b.mat.emissiveIntensity = b.index ? 0.25 + s.util.index * 0.5 : 0.3 + occ * 0.3
     }
-    pages.instanceMatrix.needsUpdate = true
-    if (pages.instanceColor) pages.instanceColor.needsUpdate = true
     nodeMat.emissiveIntensity = 0.4 + s.util.index * 1.2
     // Eviction pressure: the column shifts towards red between the 80% target and the 95% trigger.
     const pressure = Math.max(0, Math.min(1, (occ - 0.8) / 0.15))
